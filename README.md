@@ -3,15 +3,15 @@ Backend for my sencond project, it's a REST API created with Fastify.
 # Technologies  
 -nodeJS  
 
--javascript  
+- javascript  
 
--Typescript  
+- Typescript  
   
--Fastify  
+- Fastify  
 
--Mongoose  
+- Mongoose  
 
--MongoDB  
+- MongoDB  
 
--env  
+- env  
 
