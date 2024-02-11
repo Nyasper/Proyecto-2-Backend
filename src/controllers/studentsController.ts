@@ -4,9 +4,20 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 
 connectMongoDB();
 
-export async function getAllCharas(req: FastifyRequest, res: FastifyReply) {
+export async function getAllCharas(
+	req: FastifyRequest<{ Querystring: { limit?: number } }>,
+	res: FastifyReply
+) {
 	try {
-		const charas = await Student.find({}).sort({ school: 1, name: 1 });
+		let charas = [];
+		if (req.query.limit && req.query.limit > 0) {
+			charas = await Student.find({})
+				.limit(req.query.limit)
+				.sort({ school: 1, name: 1 });
+		} else {
+			charas = await Student.find({}).sort({ school: 1, name: 1 });
+		}
+
 		if (!charas) {
 			throw new Error('Error trying getting all charas');
 		}
@@ -39,13 +50,30 @@ export async function getAllSchoolsNames(
 	res: FastifyReply
 ) {
 	try {
-		const schools = await Student.find({})
-			.sort({ school: 1 })
-			.distinct('school');
+		const schools = await Student.find({}).sort({ name: 1 }).distinct('school');
 		if (!schools) {
 			throw new Error('Error trying getting all schools');
 		}
 		return res.status(200).send(schools);
+	} catch (error) {
+		console.error(error);
+		return res.status(500).send({ error: 'Internal Server Error' });
+	}
+}
+
+export async function getOneSchoolCharas(
+	req: FastifyRequest<{ Params: { schoolName: string } }>,
+	res: FastifyReply
+) {
+	try {
+		const school = req.params.schoolName;
+		const charas = await Student.find({ school }).sort({ school: 1, name: 1 });
+		if (!charas || !charas.length) {
+			return res
+				.status(200)
+				.send({ message: `No characters from schoool ${school} founded.` });
+		}
+		return res.status(200).send(charas);
 	} catch (error) {
 		console.error(error);
 		return res.status(500).send({ error: 'Internal Server Error' });

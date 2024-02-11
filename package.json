@@ -12,6 +12,7 @@
 	"author": "Nyasper",
 	"license": "ISC",
 	"dependencies": {
+		"@fastify/cors": "^9.0.1",
 		"dotenv": "^16.4.1",
 		"fastify": "^4.26.0",
 		"mongoose": "^8.1.1"
