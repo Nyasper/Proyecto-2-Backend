@@ -9,6 +9,8 @@ app.register(charaRoutes, { prefix: '/api/chara' });
 
 app.get('/', () => 'Proyecto 2 Backend');
 
+app.get('/test', () => 'Testeando');
+
 async function run() {
 	try {
 		const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
