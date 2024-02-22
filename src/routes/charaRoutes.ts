@@ -3,9 +3,9 @@ import {
 	getAllCharas,
 	getCharaByCharaName,
 	getAllSchoolsNames,
-	getOneSchoolCharas,
-	getCategoryByQueryParam,
+	categoryController,
 } from '../controllers/studentsController';
+import { getAllCategoryes } from '../controllers/categories';
 
 export default async function charaRoutes(app: FastifyInstance) {
 	app.get('/', () => {
@@ -16,9 +16,7 @@ export default async function charaRoutes(app: FastifyInstance) {
 
 	app.get('/:charaName', getCharaByCharaName);
 
-	app.get('/schools/all', getAllSchoolsNames);
+	app.get('/category/all', getAllCategoryes);
 
-	app.get('/schools/:schoolName', getOneSchoolCharas);
-
-	app.get('/category', getCategoryByQueryParam);
+	app.get('/category/:categoryName', categoryController);
 }

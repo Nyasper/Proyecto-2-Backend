@@ -1,6 +1,7 @@
 import { connectMongoDB } from '../db/mongo';
 import Student from '../db/studentModel';
 import { FastifyRequest, FastifyReply } from 'fastify';
+import { manageParamQuery, manageParamUrl } from './categories';
 
 connectMongoDB();
 
@@ -45,6 +46,24 @@ export async function getCharaByCharaName(
 	}
 }
 
+export async function categoryController(
+	req: FastifyRequest<{
+		Querystring: { value: string };
+		Params: { categoryName: string };
+	}>,
+	res: FastifyReply
+) {
+	const existParams = Object.keys(req.query).length > 0;
+
+	if (existParams) {
+		return await manageParamQuery(req, res, Student);
+	}
+	if (req.params.categoryName) {
+		return await manageParamUrl(req, res, Student);
+	}
+	return res.status(400).send({ message: 'Bad Request' });
+}
+
 export async function getAllSchoolsNames(
 	req: FastifyRequest,
 	res: FastifyReply
@@ -55,69 +74,6 @@ export async function getAllSchoolsNames(
 			throw new Error('Error trying getting all schools');
 		}
 		return res.status(200).send(schools);
-	} catch (error) {
-		console.error(error);
-		return res.status(500).send({ error: 'Internal Server Error' });
-	}
-}
-
-export async function getOneSchoolCharas(
-	req: FastifyRequest<{ Params: { schoolName: string } }>,
-	res: FastifyReply
-) {
-	try {
-		const school = req.params.schoolName;
-		const charas = await Student.find({ school }).sort({ school: 1, name: 1 });
-		if (!charas || !charas.length) {
-			return res
-				.status(200)
-				.send({ message: `No characters from schoool ${school} founded.` });
-		}
-		return res.status(200).send(charas);
-	} catch (error) {
-		console.error(error);
-		return res.status(500).send({ error: 'Internal Server Error' });
-	}
-}
-
-export async function getCategoryByQueryParam(
-	req: FastifyRequest<{
-		Querystring: { category: string; value: string };
-	}>,
-	res: FastifyReply
-) {
-	const categories = [
-		'name',
-		'age',
-		'designer',
-		'illustrator',
-		'voice',
-		'role',
-		'combatClass',
-		'weaponType',
-		'skinSet',
-	];
-	try {
-		const { category, value } = req.query;
-
-		if (!category || !value) {
-			return res.status(400).send({ error: 'category or value not provided' });
-		}
-
-		const categoryName = categories.find((element) => element === category);
-
-		if (!categoryName) {
-			return res
-				.status(400)
-				.send({ error: 'categoryName invalid or not exists.' });
-		}
-
-		const charas = await Student.find({ [categoryName]: value }).sort({
-			school: 1,
-			name: 1,
-		});
-
-		return res.status(200).send(charas);
 	} catch (error) {
 		console.error(error);
 		return res.status(500).send({ error: 'Internal Server Error' });
