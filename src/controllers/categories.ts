@@ -35,9 +35,10 @@ export async function manageParamUrl(
 		);
 
 		if (validCategory) {
-			const categories = await Student.find({})
+			const categories = await Student.find({ [validCategory]: { $ne: null } })
 				.sort({ school: 1, name: 1 })
 				.distinct(validCategory);
+
 			return res.status(200).send(categories);
 		}
 		return res.status(400).send({ error: 'categoryName not valid.' });
